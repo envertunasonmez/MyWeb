@@ -403,11 +403,13 @@ section {
   .tech-stack-scroll {
     max-width: 100vw;
     padding: 0 12px;
+    scroll-snap-type: x mandatory; /* mobilde her kart tek tek hizalansın */
   }
   .tech-item {
     width: calc(100vw - 24px);
     min-width: calc(100vw - 24px);
     max-width: calc(100vw - 24px);
+    scroll-snap-align: center;
   }
 }
 

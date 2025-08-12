@@ -56,6 +56,42 @@ if (scrollContainer) {
 
   buildIndicators();
 
+  // Auto-advance slider for mobile
+  let autoplayTimer = null;
+  function startAutoplay() {
+    stopAutoplay();
+    if (window.innerWidth > 600) return; // only mobile
+    autoplayTimer = setInterval(() => {
+      const maxScroll = (techItems.length - 1) * itemWidth; // approximate
+      const nextLeft = scrollContainer.scrollLeft + itemWidth;
+      const wrapped = nextLeft > maxScroll;
+      scrollContainer.scrollTo({
+        left: wrapped ? 0 : nextLeft,
+        behavior: 'smooth'
+      });
+    }, 2000);
+  }
+  function stopAutoplay() {
+    if (autoplayTimer) {
+      clearInterval(autoplayTimer);
+      autoplayTimer = null;
+    }
+  }
+  // Pause autoplay on user interaction
+  ['touchstart','mousedown','wheel'].forEach(evt => {
+    scrollContainer.addEventListener(evt, stopAutoplay, { passive: true });
+  });
+  // Resume after some idle time
+  let resumeTimer = null;
+  ['touchend','mouseup'].forEach(evt => {
+    scrollContainer.addEventListener(evt, () => {
+      if (resumeTimer) clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(startAutoplay, 2500);
+    });
+  });
+
+  startAutoplay();
+
   function updateActiveDot() {
     const dots = indicator.querySelectorAll('.dot');
     if (!dots.length) return;
@@ -71,6 +107,8 @@ if (scrollContainer) {
     // preserve approximate page after resize
     scrollContainer.scrollLeft = Math.round(prevScrollRatio) * itemWidth * visibleCount;
     updateActiveDot();
+    // restart autoplay according to breakpoint
+    startAutoplay();
   });
 
   // Mouse drag
