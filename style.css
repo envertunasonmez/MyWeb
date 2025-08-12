@@ -10,12 +10,7 @@ html {
 
 body {
   font-family: 'Google Sans', sans-serif;
-  /* Ambient glow background */
-  background:
-    radial-gradient(720px circle at 0% 100%, rgba(153, 94, 255, 0.20), transparent 62%), /* sol alt */
-    radial-gradient(600px circle at 100% 0%, rgba(253, 45, 120, 0.18), transparent 62%), /* sağ üst */
-    #010420;
-  background-repeat: no-repeat;
+  background: #010420;
   padding-top: 70px;
   padding-bottom: 0;
   min-height: 100vh;
