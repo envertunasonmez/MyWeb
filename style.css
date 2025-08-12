@@ -1414,7 +1414,7 @@ border:  2px solid #995eff;
 /* Indicators (dotlar) */
 .indicators {
   position: absolute;
-  bottom: 16px;
+  bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
