@@ -21,32 +21,56 @@ const scrollContainer = document.getElementById('techStackScroll');
 if (scrollContainer) {
   const techItems = scrollContainer.querySelectorAll('.tech-item');
   const indicator = document.getElementById('techIndicator');
-  const itemWidth = 212; // 200 + 12 gap
-  const visibleCount = 3;
-  const totalItems = techItems.length;
-  const pageCount = Math.ceil(totalItems / visibleCount);
+  const GAP_PX = 12;
+  let itemWidth = 212; // fallback
+  let visibleCount = 3;
 
-  // Dotları oluştur
-  indicator.innerHTML = '';
-  for (let i = 0; i < pageCount; i++) {
-    const dot = document.createElement('span');
-    dot.classList.add('dot');
-    if (i === 0) dot.classList.add('active');
-    dot.addEventListener('click', () => {
-      scrollContainer.scrollTo({
-        left: i * itemWidth * visibleCount,
-        behavior: 'smooth'
-      });
-    });
-    indicator.appendChild(dot);
+  function recalcLayout() {
+    const firstItem = techItems[0];
+    const isMobile = window.innerWidth <= 600;
+    visibleCount = isMobile ? 1 : 3;
+    if (firstItem) {
+      // clientWidth includes padding, not margin; add gap for pagination width
+      itemWidth = firstItem.clientWidth + GAP_PX;
+    }
   }
-  const dots = indicator.querySelectorAll('.dot');
 
-  scrollContainer.addEventListener('scroll', () => {
-    const scrollLeft = scrollContainer.scrollLeft;
-    const page = Math.round(scrollLeft / (itemWidth * visibleCount));
+  function buildIndicators() {
+    recalcLayout();
+    const totalItems = techItems.length;
+    const pageCount = Math.ceil(totalItems / visibleCount);
+    indicator.innerHTML = '';
+    for (let i = 0; i < pageCount; i++) {
+      const dot = document.createElement('span');
+      dot.classList.add('dot');
+      if (i === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => {
+        scrollContainer.scrollTo({
+          left: i * itemWidth * visibleCount,
+          behavior: 'smooth'
+        });
+      });
+      indicator.appendChild(dot);
+    }
+  }
+
+  buildIndicators();
+
+  function updateActiveDot() {
+    const dots = indicator.querySelectorAll('.dot');
+    if (!dots.length) return;
+    const page = Math.round(scrollContainer.scrollLeft / (itemWidth * visibleCount));
     dots.forEach(dot => dot.classList.remove('active'));
     if (dots[page]) dots[page].classList.add('active');
+  }
+
+  scrollContainer.addEventListener('scroll', updateActiveDot);
+  window.addEventListener('resize', () => {
+    const prevScrollRatio = scrollContainer.scrollLeft / (itemWidth * visibleCount || 1);
+    buildIndicators();
+    // preserve approximate page after resize
+    scrollContainer.scrollLeft = Math.round(prevScrollRatio) * itemWidth * visibleCount;
+    updateActiveDot();
   });
 
   // Mouse drag
